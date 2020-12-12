@@ -501,9 +501,9 @@ public:
 
     printf("Form of canvas: ");
     switch (border) {
-      case torus: printf("torus\n");
-      case cube: printf("cube\n");
-      case surface: printf("surface\n");
+      case torus: printf("torus\n"); break;
+      case cube: printf("cube\n"); break;
+      case surface: printf("surface\n"); break;
     }
 
     // Allocate memory
