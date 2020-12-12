@@ -581,7 +581,7 @@ private:
       }
       break;
       case cube: {
-        // Edges are not connected (no torus)
+        // Edges are connected as a cube
         if (x>0) {
           if (y%panel_height>0)
             num += values_[x-1][y-1];
