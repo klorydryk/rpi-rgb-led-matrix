@@ -614,7 +614,7 @@ private:
           else if(y<5*panel_height-1)
             num += values_[y%panel_height][5*panel_height];
           else if(y<6*panel_height-1) // panel 1
-            num += values_[0][3*panel_height-y%panel_height];
+            num += values_[0][y%panel_height];
         }
         if(x==width_-1)
         {
@@ -629,7 +629,7 @@ private:
           else if(y<5*panel_height-1)
             num += values_[width_-1][3*panel_height-1-y%panel_height];
           else if(y<6*panel_height-1) // panel 1
-            num += values_[0][y%panel_height];
+            num += values_[0][3*panel_height + y%panel_height];
         }
         if(y%panel_height==0)
         {
@@ -644,22 +644,22 @@ private:
           else if(y<5*panel_height-1)
             num += values_[x][4*panel_height-1];
           else if(y<6*panel_height-1)
-            num += values_[0][x+4*panel_height];
+            num += values_[0][x+panel_height];
         }
         if(y%panel_height==panel_height-1)
         {
-          if(y<panel_height-1)
+          if(y<panel_height)
             num += values_[x][panel_height];
-          else if(y<2*panel_height-1)
+          else if(y<2*panel_height)
             num += values_[x][3*panel_height];
-          else if(y<3*panel_height-1)
+          else if(y<3*panel_height)
             num += values_[width_-1][3*panel_height+x];
-          else if(y<4*panel_height-1)
+          else if(y<4*panel_height)
             num += values_[x][4*panel_height];
-          else if(y<5*panel_height-1)
+          else if(y<5*panel_height)
             num += values_[x][0];
-          else if(y<6*panel_height-1)
-            num += values_[0][panel_height-1-x];
+          else if(y<6*panel_height)
+            num += values_[0][4*panel_height-1-x];
         }
         break;
       }
