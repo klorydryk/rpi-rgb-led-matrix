@@ -489,7 +489,7 @@ private:
 class GameLife : public DemoRunner {
 public:
   GameLife(Canvas *m, int delay_ms=500, int led_chain = 1)//bool torus_=true)
-    : DemoRunner(m), delay_ms_(delay_ms), border(torus), chain(led_chain) {
+    : DemoRunner(m), delay_ms_(delay_ms), border(cube), chain(led_chain) {
 
     width_ = canvas()->width();
     height_ = canvas()->height();
@@ -582,24 +582,16 @@ private:
       break;
       case cube: {
         // Edges are connected as a cube
-        if (x>0) {
-          if (y%panel_height>0)
+        if (x>0 && x<width_-1 && y%panel_height>0 && y%panel_height<panel_height-1) {
             num += values_[x-1][y-1];
-          if (y%panel_height<height_-1)
-            num += values_[x-1][y+1];
-          num += values_[x-1][y];
-        }
-        if (x<width_-1) {
-          if (y%panel_height>0)
             num += values_[x+1][y-1];
-          if (y%panel_height<height_-1)
+            num += values_[x][y-1];
             num += values_[x+1][y+1];
-          num += values_[x+1][y];
+            num += values_[x-1][y+1];
+            num += values_[x][y+1];
+            num += values_[x-1][y];
+            num += values_[x+1][y];
         }
-        if (y%panel_height>0)
-          num += values_[x][y-1];
-        if (y%panel_height<height_-1)
-          num += values_[x][y+1];
 
         if(x==0)
         {
