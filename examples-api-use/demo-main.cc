@@ -488,10 +488,16 @@ private:
 // Contributed by: Vliedel
 class GameLife : public DemoRunner {
 public:
-  GameLife(Canvas *m, int delay_ms=500, bool torus=true)
-    : DemoRunner(m), delay_ms_(delay_ms), torus_(torus) {
+  GameLife(Canvas *m, int delay_ms=500, int led_chain = 1)//bool torus_=true)
+    : DemoRunner(m), delay_ms_(delay_ms), border(torus), chain(led_chain) {
+
     width_ = canvas()->width();
     height_ = canvas()->height();
+
+    if(border == cube && chain < 6)
+      border = torus;
+    else
+      panel_height = height_ / chain;
 
     // Allocate memory
     values_ = new int*[width_];
@@ -561,37 +567,124 @@ public:
 private:
   int numAliveNeighbours(int x, int y) {
     int num=0;
-    if (torus_) {
-      // Edges are connected (torus)
-      num += values_[(x-1+width_)%width_][(y-1+height_)%height_];
-      num += values_[(x-1+width_)%width_][y                    ];
-      num += values_[(x-1+width_)%width_][(y+1        )%height_];
-      num += values_[(x+1       )%width_][(y-1+height_)%height_];
-      num += values_[(x+1       )%width_][y                    ];
-      num += values_[(x+1       )%width_][(y+1        )%height_];
-      num += values_[x                  ][(y-1+height_)%height_];
-      num += values_[x                  ][(y+1        )%height_];
-    }
-    else {
-      // Edges are not connected (no torus)
-      if (x>0) {
+    switch (border) {
+      case torus: {
+        // Edges are connected (torus)
+        num += values_[(x-1+width_)%width_][(y-1+height_)%height_];
+        num += values_[(x-1+width_)%width_][y                    ];
+        num += values_[(x-1+width_)%width_][(y+1        )%height_];
+        num += values_[(x+1       )%width_][(y-1+height_)%height_];
+        num += values_[(x+1       )%width_][y                    ];
+        num += values_[(x+1       )%width_][(y+1        )%height_];
+        num += values_[x                  ][(y-1+height_)%height_];
+        num += values_[x                  ][(y+1        )%height_];
+      }
+      break;
+      case cube: {
+        // Edges are not connected (no torus)
+        if (x>0) {
+          if (y%panel_height>0)
+            num += values_[x-1][y-1];
+          if (y%panel_height<height_-1)
+            num += values_[x-1][y+1];
+          num += values_[x-1][y];
+        }
+        if (x<width_-1) {
+          if (y%panel_height>0)
+            num += values_[x+1][y-1];
+          if (y%panel_height<height_-1)
+            num += values_[x+1][y+1];
+          num += values_[x+1][y];
+        }
+        if (y%panel_height>0)
+          num += values_[x][y-1];
+        if (y%panel_height<height_-1)
+          num += values_[x][y+1];
+
+        if(x==0)
+        {
+          if(y<panel_height-1)
+            num += values_[width_-1][y%panel_height+5*panel_height-1];
+          else if(y<2*panel_height-1)
+            num += values_[y%panel_height][6*panel_height-1];
+          else if(y<3*panel_height-1)
+            num += values_[width_-1][y%panel_height+panel_height-1];
+          else if(y<4*panel_height-1)
+            num += values_[0][6*panel_height-1-y%panel_height];
+          else if(y<5*panel_height-1)
+            num += values_[y%panel_height][5*panel_height];
+          else if(y<6*panel_height-1) // panel 1
+            num += values_[0][3*panel_height-y%panel_height];
+        }
+        if(x==width_-1)
+        {
+          if(y<panel_height-1)
+            num += values_[width_-1-y%panel_height][2*panel_height];
+          else if(y<2*panel_height-1)
+            num += values_[0][2*panel_height+y%panel_height];
+          else if(y<3*panel_height-1)
+            num += values_[width_-1][5*panel_height-1-y%panel_height];
+          else if(y<4*panel_height-1)
+            num += values_[y%panel_height][3*panel_height-1];
+          else if(y<5*panel_height-1)
+            num += values_[width_-1][3*panel_height-1-y%panel_height];
+          else if(y<6*panel_height-1) // panel 1
+            num += values_[0][y%panel_height];
+        }
+        if(y%panel_height==0)
+        {
+          if(y<panel_height-1)
+            num += values_[x][5*panel_height-1];
+          else if(y<2*panel_height-1)
+            num += values_[x][panel_height-1];
+          else if(y<3*panel_height-1)
+            num += values_[width_-1][panel_height-1-x];
+          else if(y<4*panel_height-1)
+            num += values_[x][2*panel_height-1];
+          else if(y<5*panel_height-1)
+            num += values_[x][4*panel_height-1];
+          else if(y<6*panel_height-1)
+            num += values_[0][x+4*panel_height];
+        }
+        if(y%panel_height==panel_height-1)
+        {
+          if(y<panel_height-1)
+            num += values_[x][panel_height];
+          else if(y<2*panel_height-1)
+            num += values_[x][3*panel_height];
+          else if(y<3*panel_height-1)
+            num += values_[width_-1][3*panel_height+x];
+          else if(y<4*panel_height-1)
+            num += values_[x][4*panel_height];
+          else if(y<5*panel_height-1)
+            num += values_[x][0];
+          else if(y<6*panel_height-1)
+            num += values_[0][panel_height-1-x];
+        }
+        break;
+      }
+      case surface: {
+        // Edges are not connected (no torus)
+        if (x>0) {
+          if (y>0)
+            num += values_[x-1][y-1];
+          if (y<height_-1)
+            num += values_[x-1][y+1];
+          num += values_[x-1][y];
+        }
+        if (x<width_-1) {
+          if (y>0)
+            num += values_[x+1][y-1];
+          if (y<height_-1)
+            num += values_[x+1][y+1];
+          num += values_[x+1][y];
+        }
         if (y>0)
-          num += values_[x-1][y-1];
+          num += values_[x][y-1];
         if (y<height_-1)
-          num += values_[x-1][y+1];
-        num += values_[x-1][y];
+          num += values_[x][y+1];
       }
-      if (x<width_-1) {
-        if (y>0)
-          num += values_[x+1][y-1];
-        if (y<31)
-          num += values_[x+1][y+1];
-        num += values_[x+1][y];
-      }
-      if (y>0)
-        num += values_[x][y-1];
-      if (y<height_-1)
-        num += values_[x][y+1];
+      break;
     }
     return num;
   }
@@ -636,6 +729,13 @@ private:
   int width_;
   int height_;
   bool torus_;
+  enum border {
+    torus,
+    cube,
+    surface
+  } border;
+  int chain;
+  int panel_height;
 };
 
 // Langton's ant
@@ -1148,7 +1248,7 @@ int main(int argc, char *argv[]) {
     break;
 
   case 7:
-    demo_runner = new GameLife(canvas, scroll_ms);
+    demo_runner = new GameLife(canvas, scroll_ms, matrix_options.chain_length);
     break;
 
   case 8:
