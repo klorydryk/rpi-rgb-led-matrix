@@ -499,6 +499,13 @@ public:
     else
       panel_height = height_ / chain;
 
+    printf("Form of canvas: ");
+    switch (border) {
+      case torus: printf("torus\n");
+      case cube: printf("cube\n");
+      case surface: printf("surface\n");
+    }
+
     // Allocate memory
     values_ = new int*[width_];
     for (int x=0; x<width_; ++x) {
@@ -582,28 +589,29 @@ private:
       break;
       case cube: {
         // Edges are connected as a cube
-        if (x>0 && x<width_-1 && y%panel_height>0 && y%panel_height<panel_height-1) {
+        if (x>0 && x<width_-1 && y%panel_height>0 && y%panel_height<panel_height-1)
+        {
             num += values_[x-1][y-1];
-            num += values_[x+1][y-1];
-            num += values_[x][y-1];
-            num += values_[x+1][y+1];
-            num += values_[x-1][y+1];
-            num += values_[x][y+1];
             num += values_[x-1][y];
+            num += values_[x-1][y+1];
+            num += values_[x][y-1];
+            num += values_[x][y+1];
+            num += values_[x+1][y-1];
             num += values_[x+1][y];
+            num += values_[x+1][y+1];
         }
 
         if(x==0)
         {
-          if(y<panel_height-1)
+          if(y<panel_height-1) // panel 6
             num += values_[width_-1][y%panel_height+5*panel_height-1];
-          else if(y<2*panel_height-1)
+          else if(y<2*panel_height-1) // panel 5
             num += values_[y%panel_height][6*panel_height-1];
-          else if(y<3*panel_height-1)
+          else if(y<3*panel_height-1) // panel 4
             num += values_[width_-1][y%panel_height+panel_height-1];
-          else if(y<4*panel_height-1)
+          else if(y<4*panel_height-1) // panel 3
             num += values_[0][6*panel_height-1-y%panel_height];
-          else if(y<5*panel_height-1)
+          else if(y<5*panel_height-1) // panel 2
             num += values_[y%panel_height][5*panel_height];
           else if(y<6*panel_height-1) // panel 1
             num += values_[0][y%panel_height];
